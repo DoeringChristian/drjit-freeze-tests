@@ -1,0 +1,4 @@
+out/
+scenes/
+__pycache__
+.pytest_cache

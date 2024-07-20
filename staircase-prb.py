@@ -26,7 +26,9 @@ if __name__ == "__main__":
     w = 1024
     h = 1024
 
-    scene = mi.load_file("scenes/staircase/scene_v3.xml", resx=w, resy=h)
+    scene = mi.load_file(
+        "scenes/staircase/scene_v3.xml", resx=w, resy=h, integrator="prb"
+    )
 
     params = mi.traverse(scene)
     print(params)
@@ -77,8 +79,8 @@ if __name__ == "__main__":
         params[k].x = value + 10.0 * i
         params.update()
 
-        dr.sync_thread()
         start = time.time()
+        dr.sync_thread()
         result = frozen(scene, (params[k].x))
         dr.eval(result)
         dr.sync_thread()

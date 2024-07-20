@@ -6,7 +6,13 @@ mi.set_variant("cuda_ad_rgb")
 if __name__ == "__main__":
     dr.set_log_level(dr.LogLevel.Trace)
     dr.set_flag(dr.JitFlag.Debug, True)
-    scene = mi.load_file("scenes/cbox/cbox.xml", res=128, integrator="prb")
+    dr.set_flag(dr.JitFlag.ReuseIndices, False)
+    dr.set_flag(dr.JitFlag.LaunchBlocking, True)
+    scene = mi.cornell_box()
+    scene["integrator"] = {
+        "type": "prb",
+    }
+    scene = mi.load_dict(scene)
     image_ref = mi.render(scene, spp=512)
 
     # Preview the reference image
@@ -58,6 +64,7 @@ if __name__ == "__main__":
         # Track the difference between the current color and the true value
         err_ref = dr.sum(dr.sqr(param_ref - params[key]))
         print(f"Iteration {it:02d}: parameter error = {err_ref[0]:6f}", end="\r")
+        mi.util.write_bitmap(f"out/{it}.jpg", image)
         errors.append(err_ref)
     print("\nOptimization complete.")
 

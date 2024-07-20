@@ -6,7 +6,7 @@ import numpy as np
 mi.set_variant("cuda_ad_rgb")
 # mi.set_variant("llvm_ad_rgb")
 
-# import mypath
+import mypath
 
 if __name__ == "__main__":
     # dr.set_log_level(dr.LogLevel.Trace)
@@ -26,7 +26,9 @@ if __name__ == "__main__":
     w = 1024
     h = 1024
 
-    scene = mi.load_file("scenes/staircase/scene_v3.xml", resx=w, resy=h)
+    scene = mi.load_file(
+        "scenes/staircase/scene_v3.xml", resx=w, resy=h, integrator="mypath"
+    )
 
     params = mi.traverse(scene)
     print(params)

@@ -25,8 +25,9 @@ def drjitstruct(cls):
     return cls
 
 
+@drjitstruct
 class Path(mi.SamplingIntegrator):
-    def __init__(self, props: mi.Properties) -> None:
+    def __init__(self, props: mi.Properties = mi.Properties()) -> None:
         self.max_depth = props.get("max_depth", def_value=16)
         self.rr_depth = props.get("rr_depth", def_value=4)
         super().__init__(props)
@@ -248,7 +249,7 @@ class Path(mi.SamplingIntegrator):
 
         return L
 
-    @dr.syntax
+    # @dr.syntax
     def sample_Lo(
         self,
         scene: mi.Scene,
@@ -288,7 +289,7 @@ class Path(mi.SamplingIntegrator):
 
         # loop.set_max_iterations(max_depth)
 
-        while active:
+        def body(sampler, si, f, L, eta, depth, active):
             # ---------------------- Emitter sampling ----------------------
             L[active] += self.sample_emitter(scene, si, bsdf_ctx, f, sampler, active)
 
@@ -350,6 +351,15 @@ class Path(mi.SamplingIntegrator):
                 & (fmax != 0.0)
                 & (depth < max_depth)
             )
+
+            return sampler, si, f, L, eta, depth, active
+
+        def cond(sampler, si, f, L, eta, depth, active):
+            return active
+
+        sampler, si, f, L, eta, depth, active = dr.while_loop(
+            state=(sampler, si, f, L, eta, depth, active), cond=cond, body=body
+        )
 
         return L, (depth != 0)
 
