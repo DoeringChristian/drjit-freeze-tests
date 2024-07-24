@@ -6,7 +6,7 @@ mi.set_variant("cuda_ad_rgb")
 
 
 def mse(image, image_ref):
-    return dr.sum(dr.square(image - image_ref))
+    return dr.mean(dr.mean(dr.square(image - image_ref)))
 
 
 def optimize(scene, opt, ref, params):

@@ -13,6 +13,7 @@ def loop(x: mi.Float, y: mi.Float, n: int = 10):
     y, i = mi.Float(0), mi.UInt(0)
 
     while dr.hint(i < n, max_iterations=-1):
+        # while i < n:
         y += f(x, y, i)
         i += 1
 
@@ -33,19 +34,20 @@ if __name__ == "__main__":
     ref = loop(x, y)
     print(f"{ref=}")
 
-    x = dr.opaque(mi.Float, 0, shape=3)
-    y = dr.opaque(mi.Float, 2, shape=10)
+    x = dr.opaque(mi.Float, 2, shape=3)
+    y = dr.opaque(mi.Float, 3, shape=10)
 
     opt = mi.ad.Adam(lr=0.05, params={key: x})
     dr.enable_grad(opt[key])
 
     def mse(res):
-        return dr.mean(dr.square(res - ref))
+        return dr.mean(dr.mean(dr.square(res - ref)))
 
     for it in range(50):
         x = opt[key]
 
         res = loop(x, y)
+        print(f"{res=}")
 
         loss = mse(res)
 

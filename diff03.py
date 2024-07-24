@@ -6,12 +6,15 @@ mi.set_variant("cuda_ad_rgb")
 if __name__ == "__main__":
     dr.set_log_level(dr.LogLevel.Trace)
     dr.set_flag(dr.JitFlag.Debug, True)
+    dr.set_flag(dr.JitFlag.LoopOptimize, True)
     dr.set_flag(dr.JitFlag.ReuseIndices, False)
     dr.set_flag(dr.JitFlag.LaunchBlocking, True)
     scene = mi.cornell_box()
     scene["integrator"] = {
         "type": "prb",
     }
+    del scene["small-box"]
+    del scene["large-box"]
     scene = mi.load_dict(scene)
     image_ref = mi.render(scene, spp=512)
 
@@ -29,7 +32,7 @@ if __name__ == "__main__":
     params[key] = mi.Color3f(0.01, 0.2, 0.9)
     params.update()
 
-    image_init = mi.render(scene, params, spp=128)
+    image_init = mi.render(scene, spp=128)
     mi.util.write_bitmap("out/init.jpg", image_init)
 
     opt = mi.ad.Adam(lr=0.05)
@@ -37,14 +40,15 @@ if __name__ == "__main__":
     params.update(opt)
 
     def mse(image):
-        return dr.mean(dr.square(image - image_ref))
+        return dr.mean(dr.mean(dr.square(image - image_ref)))
 
     iteration_count = 50
 
     errors = []
     for it in range(iteration_count):
         # Perform a (noisy) differentiable rendering of the scene
-        image = mi.render(scene, params, spp=4)
+        image = mi.render(scene, spp=4)
+        mi.util.write_bitmap(f"out/{it}.jpg", image)
 
         # Evaluate the objective function from the current rendered image
         loss = mse(image)
@@ -64,7 +68,6 @@ if __name__ == "__main__":
         # Track the difference between the current color and the true value
         err_ref = dr.sum(dr.sqr(param_ref - params[key]))
         print(f"Iteration {it:02d}: parameter error = {err_ref[0]:6f}", end="\r")
-        mi.util.write_bitmap(f"out/{it}.jpg", image)
         errors.append(err_ref)
     print("\nOptimization complete.")
 

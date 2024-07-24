@@ -38,7 +38,9 @@ if __name__ == "__main__":
     n = 10
 
     k = "Rectangle.emitter.radiance.value"
+    params[k] = mi.Color3f(30, 30, 30)
     value = mi.Float(params[k].x)
+    params.update()
 
     t_ref = 0
     t_ref_exec = 0
