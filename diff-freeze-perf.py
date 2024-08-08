@@ -8,7 +8,7 @@ key = "red.reflectance.value"
 
 
 def mse(image, image_ref, n):
-    return dr.sum(dr.square(image - image_ref), axis=None) / n
+    return dr.mean(dr.square(image - image_ref), axis=None) / n
 
 
 def optimize(scene, opt, ref, n, other):
@@ -20,7 +20,7 @@ def optimize(scene, opt, ref, n, other):
     image = mi.render(scene, params, spp=1)
 
     # Evaluate the objective function from the current rendered image
-    loss = mse(image, ref, n)
+    loss = mse(image, ref, 1)
 
     # Backpropagate through the rendering process
     dr.backward(loss)
