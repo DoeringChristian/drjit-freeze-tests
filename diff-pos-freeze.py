@@ -155,7 +155,7 @@ def run(optimize, b, n, name):
 
         params = mi.traverse(scene)
         params.keep("bunny.vertex_positions")
-        print(f"{dr.grad(params['bunny.vertex_positions']).index=}")
+        print(f"before: {dr.max(dr.grad(params['bunny.vertex_positions']))=}")
         apply_transformation(initial_vertex_positions, opt, params)
         print("params.update()")
         params.update(opt)
@@ -170,22 +170,17 @@ def run(optimize, b, n, name):
                 image_ref,
                 initial_vertex_positions,
                 [
-                    opt["angle"],
-                    opt["trans"],
-                    opt.lr_default_v,
-                    opt.state,
                     params["bunny.vertex_positions"],
                 ],
             )
         dr.sync_thread()
         end = time.time()
-        print(f"{dr.grad(params['bunny.vertex_positions'])=}")
+        print(f"after: {dr.max(dr.grad(params['bunny.vertex_positions']))=}")
+        dr.backward_from(params["bunny.vertex_positions"])
 
         opt.step()
 
         mi.util.write_bitmap(f"out/{name}/{it}.jpg", image)
-
-        print(f"after: {opt['trans']=}, {loss=}")
 
         if it >= b:
             duration += end - start
@@ -198,7 +193,7 @@ def run(optimize, b, n, name):
 
 
 if __name__ == "__main__":
-    dr.set_log_level(dr.LogLevel.Trace)
+    # dr.set_log_level(dr.LogLevel.Trace)
     # dr.set_flag(dr.JitFlag.Debug, True)
     dr.set_flag(dr.JitFlag.ReuseIndices, False)
     dr.set_flag(dr.JitFlag.LaunchBlocking, True)
