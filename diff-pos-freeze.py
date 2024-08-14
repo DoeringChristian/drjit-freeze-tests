@@ -176,7 +176,7 @@ def run(optimize, b, n, name):
         dr.sync_thread()
         end = time.time()
         print(f"after: {dr.max(dr.grad(params['bunny.vertex_positions']))=}")
-        dr.backward_from(params["bunny.vertex_positions"])
+        print(f"    {dr.grad(opt['trans'])=}")
 
         opt.step()
 
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     dr.set_flag(dr.JitFlag.OptimizeLoops, True)
 
     n = 2
-    b = 4
+    b = 100
 
     print("Reference:")
     t_ref = run(optimize, b, n, "ref")
