@@ -2,7 +2,7 @@ import drjit as dr
 import mitsuba as mi
 import time
 
-mi.set_variant("cuda_ad_rgb")
+mi.set_variant("llvm_ad_rgb")
 
 key = "red.reflectance.value"
 

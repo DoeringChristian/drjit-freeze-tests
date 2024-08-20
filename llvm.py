@@ -23,8 +23,8 @@ if __name__ == "__main__":
             result = mi.render(scene, spp=1)
         return result
 
-    w = 1024
-    h = 1024
+    w = 128
+    h = 128
 
     scene = mi.cornell_box()
     # del scene["large-box"]
@@ -38,8 +38,8 @@ if __name__ == "__main__":
     params = mi.traverse(scene)
     print(params)
 
-    b = 0
-    n = 3
+    b = 3
+    n = 10
 
     k = "light.emitter.radiance.value"
     value = mi.Float(params[k].x)
@@ -82,6 +82,7 @@ if __name__ == "__main__":
 
         dr.sync_thread()
         start = time.time()
+        dr.sync_thread()
         result = frozen(scene, (params[k].x))
         dr.eval(result)
         dr.sync_thread()
