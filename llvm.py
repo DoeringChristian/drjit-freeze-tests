@@ -9,13 +9,13 @@ mi.set_variant("llvm_ad_rgb")
 # import mypath
 
 if __name__ == "__main__":
-    dr.set_log_level(dr.LogLevel.Trace)
+    # dr.set_log_level(dr.LogLevel.Trace)
     # dr.set_log_level(dr.LogLevel.Debug)
-    dr.set_flag(dr.JitFlag.KernelHistory, True)
-    dr.set_flag(dr.JitFlag.VCallOptimize, False)
-    dr.set_flag(dr.JitFlag.SymbolicCalls, True)
-    dr.set_flag(dr.JitFlag.Debug, True)
-    dr.set_flag(dr.JitFlag.ReuseIndices, False)
+    # dr.set_flag(dr.JitFlag.KernelHistory, True)
+    # dr.set_flag(dr.JitFlag.VCallOptimize, False)
+    # dr.set_flag(dr.JitFlag.SymbolicCalls, True)
+    # dr.set_flag(dr.JitFlag.Debug, True)
+    # dr.set_flag(dr.JitFlag.ReuseIndices, False)
     dr.set_flag(dr.JitFlag.LaunchBlocking, True)
 
     def func(scene: mi.Scene, x) -> mi.TensorXf:
@@ -23,8 +23,8 @@ if __name__ == "__main__":
             result = mi.render(scene, spp=1)
         return result
 
-    w = 128
-    h = 128
+    w = 1024
+    h = 1024
 
     scene = mi.cornell_box()
     # del scene["large-box"]

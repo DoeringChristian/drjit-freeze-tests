@@ -198,12 +198,12 @@ def run(optimize, b, n, name):
 if __name__ == "__main__":
     # dr.set_log_level(dr.LogLevel.Trace)
     # dr.set_flag(dr.JitFlag.Debug, True)
-    dr.set_flag(dr.JitFlag.ReuseIndices, False)
-    dr.set_flag(dr.JitFlag.LaunchBlocking, True)
-    dr.set_flag(dr.JitFlag.OptimizeLoops, True)
+    # dr.set_flag(dr.JitFlag.ReuseIndices, False)
+    # dr.set_flag(dr.JitFlag.LaunchBlocking, True)
+    # dr.set_flag(dr.JitFlag.OptimizeLoops, True)
 
-    n = 2
-    b = 10
+    n = 10
+    b = 3
 
     print("Reference:")
     t_ref = run(optimize, b, n, "ref")

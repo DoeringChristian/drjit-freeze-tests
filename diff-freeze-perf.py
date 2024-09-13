@@ -100,7 +100,7 @@ if __name__ == "__main__":
     dr.set_flag(dr.JitFlag.LaunchBlocking, True)
     dr.set_flag(dr.JitFlag.OptimizeLoops, True)
 
-    n = 2
+    n = 10
     b = 4
 
     print("Reference:")
