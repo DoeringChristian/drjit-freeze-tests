@@ -1,24 +1,33 @@
-import mitsuba as mi
 import drjit as dr
+import mitsuba as mi
 
-if __name__ == "__main__":
-    mi.set_variant("cuda_ad_rgb")
+mi.set_variant("cuda_ad_rgb")
 
 
 @dr.syntax(print_code=True)
-def loop(tex: mi.Texture, x: mi.Float):
-
-    i = mi.UInt(0)
-    y = dr.full(mi.Float, 0, 10)
+def loop(texture: mi.Texture) -> mi.Color3f:
+    res = mi.Color3f(0)
+    # i = mi.UInt32(0)
+    i = dr.arange(mi.UInt, 10)
+    dr.make_opaque(i)
 
     while dr.hint(i < 10, max_iterations=-1):
-        y += tex.eval(mi.SurfaceInteraction3f()).x * x
+        res += texture.eval(mi.SurfaceInteraction3f()) + mi.Float(i)
         i += 1
 
-    return y
+    res /= 10
+
+    return res
 
 
 if __name__ == "__main__":
+    # dr.set_log_level(dr.LogLevel.Trace)
+    # dr.set_flag(dr.JitFlag.Debug, True)
+    dr.set_flag(dr.JitFlag.LoopOptimize, True)
+    dr.set_flag(dr.JitFlag.ReuseIndices, False)
+    dr.set_flag(dr.JitFlag.LaunchBlocking, True)
+
+    use_loop = True
 
     tex: mi.Texture = mi.load_dict(
         {
@@ -27,20 +36,26 @@ if __name__ == "__main__":
         }
     )
 
-    x = dr.opaque(mi.Float, 1, 10)
-    dr.enable_grad(x)
+    dr.schedule(tex)
 
-    opt = mi.ad.Adam(lr=0.01, params={"x": x})
+    params = mi.traverse(tex)
 
-    for i in range(10):
-        x = opt["x"]
+    # spec_avg = dr.freeze(spec_avg)
 
-        y = loop(tex, x)
+    opt = mi.ad.Adam(lr=0.05)
+    opt["value"] = params["value"]
+    params.update(opt)
 
-        loss = dr.sum(y)
+    def mse(image):
+        return dr.mean(dr.mean(dr.square(image)))
 
-        dr.backward(y)
+    for it in range(50):
+        res = loop(tex)
+
+        loss = mse(res)
+
+        dr.backward(loss)
 
         opt.step()
 
-    print(f"{x=}")
+        params.update(opt)
