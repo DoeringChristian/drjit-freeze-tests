@@ -5,17 +5,15 @@ mi.set_variant("cuda_ad_rgb")
 
 
 @dr.syntax(print_code=True)
-def loop(texture: mi.Texture) -> mi.Color3f:
+def loop(tex: mi.Texture) -> mi.Color3f:
     res = mi.Color3f(0)
     # i = mi.UInt32(0)
     i = dr.arange(mi.UInt, 10)
     dr.make_opaque(i)
 
     while dr.hint(i < 10, max_iterations=-1):
-        res += texture.eval(mi.SurfaceInteraction3f()) + mi.Float(i)
+        res += tex.eval(mi.SurfaceInteraction3f()) + mi.Float(i)
         i += 1
-
-    res /= 10
 
     return res
 
@@ -50,9 +48,9 @@ if __name__ == "__main__":
         return dr.mean(dr.mean(dr.square(image)))
 
     for it in range(50):
-        res = loop(tex)
+        y = loop(tex)
 
-        loss = mse(res)
+        loss = mse(y)
 
         dr.backward(loss)
 
