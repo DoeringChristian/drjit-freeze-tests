@@ -18,9 +18,9 @@ if __name__ == "__main__":
     dr.set_flag(dr.JitFlag.ReuseIndices, False)
     dr.set_flag(dr.JitFlag.LaunchBlocking, True)
 
-    def func(scene: mi.Scene, x) -> mi.TensorXf:
+    def func(scene: mi.Scene, integrator: mi.Integrator, x) -> mi.TensorXf:
         with dr.profile_range("render"):
-            result = mi.render(scene, spp=1)
+            result = mi.render(scene, integrator=integrator, spp=1)
         return result
 
     w = 1024
@@ -36,6 +36,7 @@ if __name__ == "__main__":
     # exit()
     b = 2
     n = 10
+    integrator_type = "prb"
 
     k = "Rectangle.emitter.radiance.value"
     params[k] = mi.Color3f(30, 30, 30)
@@ -49,11 +50,13 @@ if __name__ == "__main__":
         params[k].x = value + 10.0 * i
         params.update()
 
+        integrator: mi.Integrator = mi.load_dict({"type": integrator_type})
+
         dr.kernel_history_clear()
 
         dr.sync_thread()
         start = time.time()
-        reference = func(scene, params[k].x)
+        reference = func(scene, integrator, params[k].x)
         dr.eval(reference)
         dr.sync_thread()
         end = time.time()
@@ -79,9 +82,11 @@ if __name__ == "__main__":
         params[k].x = value + 10.0 * i
         params.update()
 
+        integrator: mi.Integrator = mi.load_dict({"type": integrator_type})
+
         dr.sync_thread()
         start = time.time()
-        result = frozen(scene, (params[k].x))
+        result = frozen(scene, integrator, (params[k].x))
         dr.eval(result)
         dr.sync_thread()
         end = time.time()
