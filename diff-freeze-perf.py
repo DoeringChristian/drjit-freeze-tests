@@ -96,9 +96,9 @@ def run(optimize, b, n, name):
 if __name__ == "__main__":
     # dr.set_log_level(dr.LogLevel.Debug)
     # dr.set_flag(dr.JitFlag.Debug, True)
-    dr.set_flag(dr.JitFlag.ReuseIndices, False)
-    dr.set_flag(dr.JitFlag.LaunchBlocking, True)
-    dr.set_flag(dr.JitFlag.OptimizeLoops, True)
+    # dr.set_flag(dr.JitFlag.ReuseIndices, False)
+    # dr.set_flag(dr.JitFlag.LaunchBlocking, True)
+    # dr.set_flag(dr.JitFlag.OptimizeLoops, True)
 
     n = 10
     b = 4

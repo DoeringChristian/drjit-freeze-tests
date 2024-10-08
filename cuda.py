@@ -3,8 +3,8 @@ import drjit as dr
 import time
 import numpy as np
 
-# mi.set_variant("cuda_ad_rgb")
-mi.set_variant("llvm_ad_rgb")
+mi.set_variant("cuda_ad_rgb")
+# mi.set_variant("llvm_ad_rgb")
 
 # import mypath
 
@@ -14,24 +14,16 @@ if __name__ == "__main__":
     # dr.set_flag(dr.JitFlag.SymbolicCalls, True)
     # dr.set_flag(dr.JitFlag.Debug, True)
 
-    dr.set_log_level(dr.LogLevel.Trace)
-    dr.set_flag(dr.JitFlag.ReuseIndices, False)
-    dr.set_flag(dr.JitFlag.LaunchBlocking, True)
+    # dr.set_log_level(dr.LogLevel.Trace)
+    # dr.set_flag(dr.JitFlag.ReuseIndices, False)
+    # dr.set_flag(dr.JitFlag.LaunchBlocking, True)
     # dr.set_flag(dr.JitFlag.KernelHistory, True)
 
     def func(scene: mi.Scene, x) -> mi.TensorXf:
         dr.kernel_history_clear()
         with dr.profile_range("render"):
             result = mi.render(scene, spp=1)
-            print(f"{result.state=}")
             dr.eval(result)
-            kernels = [
-                kernel
-                for kernel in dr.kernel_history()
-                if kernel["type"] == dr.KernelType.JIT
-            ]
-            print(f"{len(kernels)=}")
-            print(f"{result.state=}")
         return result
 
     w = 1024

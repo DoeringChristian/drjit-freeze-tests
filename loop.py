@@ -8,8 +8,8 @@ mi.set_variant("cuda_ad_rgb")
 def loop(x: mi.Float, y: mi.Float, n: int = 10) -> mi.Float:
 
     i = mi.UInt(0)
-    while dr.hint(i < n, max_iterations=-1):
-        y += 1
+    while dr.hint(i < n):
+        y += dr.gather(mi.Float, x, 0)
         dr.scatter(x, y, i % 3)
         i += 1
 
@@ -30,12 +30,7 @@ if __name__ == "__main__":
 
     y = dr.arange(mi.Float, 10)
     dr.make_opaque(y)
-    dr.enable_grad(y)
 
     y = loop(x, y)
 
     print(y)
-
-    dr.backward(y)
-
-    print(f"{dr.grad(y)=}")

@@ -19,7 +19,7 @@ def loop(tex: mi.Texture) -> mi.Color3f:
 
 
 if __name__ == "__main__":
-    # dr.set_log_level(dr.LogLevel.Trace)
+    dr.set_log_level(dr.LogLevel.Trace)
     # dr.set_flag(dr.JitFlag.Debug, True)
     dr.set_flag(dr.JitFlag.LoopOptimize, True)
     dr.set_flag(dr.JitFlag.ReuseIndices, False)
@@ -38,11 +38,7 @@ if __name__ == "__main__":
 
     params = mi.traverse(tex)
 
-    # spec_avg = dr.freeze(spec_avg)
-
-    opt = mi.ad.Adam(lr=0.05)
-    opt["value"] = params["value"]
-    params.update(opt)
+    dr.enable_grad(params["value"])
 
     def mse(image):
         return dr.mean(dr.mean(dr.square(image)))
@@ -53,7 +49,3 @@ if __name__ == "__main__":
         loss = mse(y)
 
         dr.backward(loss)
-
-        opt.step()
-
-        params.update(opt)
