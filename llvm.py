@@ -14,8 +14,8 @@ if __name__ == "__main__":
     # dr.set_flag(dr.JitFlag.SymbolicCalls, True)
     # dr.set_flag(dr.JitFlag.Debug, True)
 
-    dr.set_log_level(dr.LogLevel.Trace)
-    dr.set_flag(dr.JitFlag.ReuseIndices, False)
+    # dr.set_log_level(dr.LogLevel.Trace)
+    # dr.set_flag(dr.JitFlag.ReuseIndices, False)
     dr.set_flag(dr.JitFlag.LaunchBlocking, True)
     # dr.set_flag(dr.JitFlag.KernelHistory, True)
 
@@ -49,8 +49,8 @@ if __name__ == "__main__":
     params = mi.traverse(scene)
     print(params)
 
-    b = 2
-    n = 10
+    b = 10
+    n = 2
 
     k = "light.emitter.radiance.value"
     value = mi.Float(params[k].x)
