@@ -2,6 +2,7 @@ import mitsuba as mi
 import drjit as dr
 import time
 import numpy as np
+import tqdm
 
 # mi.set_variant("cuda_ad_rgb")
 mi.set_variant("llvm_ad_rgb")
@@ -22,20 +23,25 @@ if __name__ == "__main__":
     # dr.set_flag(dr.JitFlag.KernelHistory, True)
 
     def func(scene: mi.Scene) -> mi.TensorXf:
-        dr.kernel_history_clear()
-        with dr.profile_range("render"):
-            result = mi.render(scene, spp=1)
-            dr.eval(result)
+        result = mi.render(scene, spp=1)
+        dr.eval(result)
         return result
 
-    def run(scene: mi.Scene, f, n):
-        # params = mi.traverse(scene)
-        for i in range(n):
-            # params[k].x = value + 10.0 * i
-            # params.update()
+    def run(scene: mi.Scene, f, b, n):
+        duration = 0
+        for i in tqdm.tqdm(range(b + n)):
+            start = time.time()
+            dr.sync_thread()
 
-            result = f(scene)
-            dr.eval(result)
+            with dr.profile_range("func"):
+                result = f(scene)
+
+            dr.sync_thread()
+            end = time.time()
+            if i > b:
+                duration += end - start
+
+        return duration / n
 
     w = 1024
     h = 1024
@@ -51,9 +57,12 @@ if __name__ == "__main__":
     params = mi.traverse(scene)
     # print(params)
 
-    n = 10
+    b = 10
+    n = 100
 
     # value = mi.Float(params[k].x)
 
-    run(scene, func, n)
-    run(scene, dr.freeze(func), n)
+    normal = run(scene, func, b, n)
+    frozen = run(scene, dr.freeze(func), b, n)
+
+    print(f"normal: {normal}s, frozen: {frozen}s")
